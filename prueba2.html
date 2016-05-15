@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8"> 
+	<title></title>
+</head>
+<style type="text/css">
+  #box1{
+    text-align: right;
+    padding-top: 2%;
+    z-index:300; 
+  }
+</style>
+ <script src="js/jquery-1.11.3.min.js"></script>
+<script>
+jQuery(document).ready(function($) {
+  $.ajax({
+  url : "http://api.wunderground.com/api/d8483e016960a875/geolookup/conditions/q/CA/San_Diego.json",
+  dataType : "jsonp",
+  success : function(parsed_json) {
+  var location = parsed_json['location']['city'];
+  var temp_f = parsed_json['current_observation']['temp_f'];
+  document.getElementById("box1").innerHTML = ("Current temperature in " + location + " is " + temp_f +" °F"); }
+  });
+});
+</script>
+<body>
+	<div id="box1"></div>
+</body>
+</html>

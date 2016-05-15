@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html>
+	<head>
+    	<meta name="viewport" content="initial-scale=1.0">
+		<meta charset="utf-8">
+		<title>Test 1</title>
+ 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
+  	<script src="js/jquery-1.11.3.min.js"></script>
+ 	<script src='js/jquery.tmpl.min.js'></script>
+  	<script src="js/knockout-1.2.1.min.js"></script>
+  	<script src="js/bootstrap.min.js"></script>
+	<script src="js/bootstrap.js"></script>
+  
+        <style type="text/css">
+		    html { 
+		    	height: 100%; 
+		    }
+			body { 
+				height: 100%; 
+				margin: 0px; 
+				padding: 0px; 
+			}
+			#content {   NEED TO ADD 
+				width: 100%; 
+				height: 100%; 
+			}
+			#navbar { 
+				z-index: 100; 
+				position: absolute; 
+		        margin: 50px 0px; 
+		        background-color: rgba(255,255,255,0.7);	
+		       	padding: 5px; 
+		    }
+			#map_canvas { 
+				width: 100%; 
+				height: 100%; 
+			}
+			#box1{
+			    text-align: right;
+			    padding-top: 5%;
+			    margin-right: 2%;
+			    z-index:100; 
+			    position: absolute; 
+		        margin: 50px 0px; 
+		        background-color: rgba(0,0,0,0);	
+		       	padding: 5px; 
+		       	width: 100%; 
+				height: 100%;
+			}
+		</style>
+	<script>
+		jQuery(document).ready(function($) {
+		  	$.ajax({
+		  	url : "http://api.wunderground.com/api/d8483e016960a875/geolookup/conditions/q/CA/San_Diego.json",
+		  	dataType : "jsonp",
+		  	success : function(parsed_json) {
+		  		var location = parsed_json['location']['city'];
+		  		var temp_f = parsed_json['current_observation']['temp_f'];
+		  		document.getElementById("box1").innerHTML = ("Current temperature in " + location + " is " + temp_f +" °F"); }
+		  });
+		});
+
+	  var places = [
+	      
+	      {name:"Ghirardelli",  
+	      city: "San Diego",
+	      location:"643 5th Ave, San Diego, CA 92101",  
+	      phone:"(619) 234-2449",
+	      lat:32.713445,
+	      lng:-117.159899},
+	      
+	      {name:"Gaslamp Quarter Association",    
+	      city: "San Diego",     
+	      location:"614 5th Ave, San Diego, CA 92101",                       
+	      phone:"(619) 233-5227",         
+	      lat:32.711965,
+	      lng:-117.160322},
+	      
+	      {name:"La Puerta",   
+	      city: "San Diego",
+	      location:"560 4th Ave, San Diego, CA 92101",  
+	      phone:"(619) 696-3466",
+	      lat:32.711177,
+	      lng:-117.161183},
+
+	      {name:"Chocolat Cremeria",   
+	      city: "San Diego",
+	      location:"509 5th Ave, San Diego, CA 92101",  
+	      phone:"(619) 238-9400",
+	      lat:32.710702,
+	      lng:-117.159964},
+
+	      {name:"Ralphs",   
+	      city: "San Diego",
+	      location:"101 G St, San Diego, CA 92101",  
+	      phone:"(619) 595-1581",
+	      lat:32.712802,
+	      lng:-117.163570},
+	    ];
+
+	  $(function() {
+
+	    var viewModel = {
+	      places: ko.observableArray(places),
+
+	      query: ko.observable(''),
+
+	      search: function(value) {
+	        viewModel.places.removeAll();
+	        var placesArray = [];
+	        var count = 0;
+	        for(var x in places) {
+	          if(places[x].name.toLowerCase().indexOf(value.toLowerCase()) >= 0) {
+	            viewModel.places.push(places[x]);
+	            placesArray[count] = places[x];
+	            count++;
+	          }
+	        }
+	        refreshMarkers(placesArray);
+	      }
+	    };
+
+	    viewModel.query.subscribe(viewModel.search);
+
+	    ko.applyBindings(viewModel);
+	  });
+
+
+	  // API GOOGLE
+		 //  jQuery(function($) {
+			//     // Asynchronously Load the map API 
+			//     var script = document.createElement('script');
+			//     script.src = "http://maps.googleapis.com/maps/api/js?sensor=false&callback=initialize";
+			//     document.body.appendChild(script);
+			// });
+		// END KNOCKOUTJS
+		// START GOOGLE MAPS API
+
+		///
+function refreshMarkers(placesArray) {
+    var map;
+    var bounds = new google.maps.LatLngBounds();
+    var mapOptions = {
+        mapTypeId: 'roadmap'
+    };
+                    
+    // Display a map on the page
+    map = new google.maps.Map(document.getElementById("map_canvas"), mapOptions);
+    map.setTilt(45);
+        
+    // Multiple Markers
+    var markers = [];
+    var infoWindowContent = [];
+	for(var x in placesArray) {
+	    markers[x] = [placesArray[x].city, placesArray[x].lat, placesArray[x].lng];
+	    infoWindowContent[x] = ['<div class="info_content">' +
+        '<h3>' + placesArray[x].name+'</h3>' +
+        '<p>' + placesArray[x].city+'</p></div>'];
+	}
+        
+    // Display multiple markers on a map
+    var infoWindow = new google.maps.InfoWindow(), marker, i;
+    
+    // Loop through our array of markers & place each one on the map  
+    for( i = 0; i < markers.length; i++ ) {
+        var position = new google.maps.LatLng(markers[i][1], markers[i][2], markers[i][3], markers[i][4], markers[i][5]);
+        bounds.extend(position);
+        marker = new google.maps.Marker({
+            position: position,
+            map: map,
+            animation: google.maps.Animation.DROP,
+            title: markers[i][0]
+        });
+        
+        // Allow each marker to have an info window    
+        google.maps.event.addListener(marker, 'click', (function(marker, i) {
+            return function() {
+                infoWindow.setContent(infoWindowContent[i][0]);
+                infoWindow.open(map, marker);
+            }
+        })(marker, i));
+
+        // Automatically center the map fitting all markers on the screen
+        map.fitBounds(bounds);
+    }
+
+    // Override our map zoom level once our fitBounds function runs (Make sure it only runs once)
+    var boundsListener = google.maps.event.addListener((map), 'bounds_changed', function(event) {
+        this.setZoom(16);
+        google.maps.event.removeListener(boundsListener);
+    });
+}
+		////
+
+function initialize(placesArray) {
+    var map;
+    var bounds = new google.maps.LatLngBounds();
+    var mapOptions = {
+        mapTypeId: 'roadmap'
+    };
+                    
+    // Display a map on the page
+    map = new google.maps.Map(document.getElementById("map_canvas"), mapOptions);
+    map.setTilt(45);
+        
+    // Multiple Markers
+    var markers = [];
+    var infoWindowContent = [];
+	for(var x in places) {
+	    markers[x] = [places[x].city, places[x].lat, places[x].lng];
+	    infoWindowContent[x] = ['<div class="info_content">' +
+        '<h3>' + places[x].name+'</h3>' +
+        '<p>' + places[x].city+'</p></div>'];
+	}
+        
+    // Display multiple markers on a map
+    var infoWindow = new google.maps.InfoWindow(), marker, i;
+    
+    // Loop through our array of markers & place each one on the map  
+    for( i = 0; i < markers.length; i++ ) {
+        var position = new google.maps.LatLng(markers[i][1], markers[i][2], markers[i][3], markers[i][4], markers[i][5]);
+        bounds.extend(position);
+        marker = new google.maps.Marker({
+            position: position,
+            map: map,
+            animation: google.maps.Animation.DROP,
+            title: markers[i][0]
+        });
+        
+        // Allow each marker to have an info window    
+        google.maps.event.addListener(marker, 'click', (function(marker, i) {
+            return function() {
+                infoWindow.setContent(infoWindowContent[i][0]);
+                infoWindow.open(map, marker);
+            }
+        })(marker, i));
+
+        // Automatically center the map fitting all markers on the screen
+        map.fitBounds(bounds);
+    }
+
+    // Override our map zoom level once our fitBounds function runs (Make sure it only runs once)
+    var boundsListener = google.maps.event.addListener((map), 'bounds_changed', function(event) {
+        this.setZoom(16);
+        google.maps.event.removeListener(boundsListener);
+    });
+
+    
+
+}
+google.maps.event.addDomListener(window, 'load', initialize);
+
+// END GOOGLE MAPS API
+	</script>
+</head>
+<body onload="initialize()">
+	<div id="content">
+	<div id="box1"></div>
+		<div id="navbar">
+			
+			<form action="#">
+		      	<input  class="form-control" placeholder="Search…" type="search" name="q" data-bind="value: query, valueUpdate: 'keyup'" autocomplete="off">
+		    </form>
+		  	<div class="content">
+		    	<ul data-bind="template: {name:'place', foreach:places}" class="nav navbar-nav">
+		    	</ul>
+		  	</div>
+		  	<script data-proofer-ignore type="text/html" id="place">
+		    	<li>
+		      		<strong data-bind="text: name"></strong>
+		      		<p data-bind="text: city"></p>
+		      		<p data-bind="text: phone"></p>
+		    	</li>
+		  	</script>
+	  	</div>
+
+		<div id="map_canvas"></div>
+		<div id="box1"></div>
+  	</div>
+
+  <script async defer
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCbz7tVqBSlgN8sBdTZlYHgEgmo4Fn9vyk&signed_in=true&callback=initMap"></script>
+</body>
+</html>
