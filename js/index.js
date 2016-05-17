@@ -11,7 +11,7 @@ jQuery(document).ready(function($) {
 	  	success : function(parsed_json) {
 	  		var location = parsed_json['location']['city'];
 	  		var temp_f = parsed_json['current_observation']['temp_f'];
-	  		document.getElementById("box1").innerHTML = ("Current temperature in <br/>" + location + " is " + temp_f +" °F"); },
+	  		document.getElementById("temperature-box").innerHTML = ("Current temperature in " + location + " is " + temp_f +" °F"); },
         error: function (textStatus, errorThrown) {
             alert('Temperature API failed to load.');
         }

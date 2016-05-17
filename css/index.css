@@ -1,31 +1,10 @@
-html { 
+html, body { 
     height: 100%; 
-}
-
-body { 
-    height: 100%; 
-    margin: 0px; 
-    padding: 0px; 
-}
-
-#content {   
-    width: 100%; 
-    height: 100%; 
-}
-
-#navbar { 
-    float: left;
-    width: 30%;
-    height: 80%;
-    position: relative; 
-    background-color: #ccc;   
 }
 
 #map_canvas { 
-    float: left;
-    position: relative;
-    width: 70%; 
-    height: 80%; 
+    width: 100%; 
+    height: 500px; 
 }
 
 p {
@@ -35,6 +14,6 @@ p {
 
 #street_view {
     width: 100%;
-    height: 20%;
+    height: 500px;
     text-align: center;
 }

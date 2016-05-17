@@ -2,33 +2,51 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <meta name="viewport" content="initial-scale=1.0">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>Neighborhood Map</title>
+        <link rel="stylesheet" href="css/bootstrap.min.css">
         <link rel="stylesheet" href="css/index.css">
     </head>
     <body onload="initialize()">
-        <div id="content">
-            <div id="navbar">
-                <div id="box1"></div><br/>
-                <form action="#">
-                    <input  class="form-control" placeholder="Search…" type="search" name="q" data-bind="value: query, valueUpdate: 'input'" autocomplete="off">
-                </form>
-                <div class="content">
-                    <ul data-bind="template: 'list' " class="nav navbar-nav"></ul>
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+                    <div class="well well-lg" id="temperature-box"></div>
                 </div>
-                <script data-proofer-ignore type="text/html" id="list">
-                    {{each myPlaces}}
-                        <li>
-                            <strong>${name}</strong>
-                            <p>${city}</p>
-                            <p>${phone}</p>
-                            <button onclick="showContent('${name}');">Show Content</button>
-                        </li>
-                    {{/each}}
-                </script>
+                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+                    <div class="well">
+                        <input class="form-control" placeholder="Search…" type="search" data-bind="value: query, valueUpdate: 'input'" autocomplete="off">
+                    </div>
+                </div>
             </div>
-            <div id="map_canvas"></div>
-            <div id="street_view">Click a marker to see the street view...</div>
+            <div class="row">
+                <div class="col-xs-12 col-sm-8 col-md-8 col-lg-8">
+                    <div class="well" id="map_canvas"></div>
+                </div>
+                <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4">
+                    <div class="list-group" data-bind="template: 'list' "></div>
+                    <script data-proofer-ignore type="text/html" id="list">
+                        {{each myPlaces}}
+                            <a href="#" class="list-group-item" onclick="showContent('${name}');">
+                            <strong>${name}</strong>
+                                <p>${city}</p>
+                                <p>${phone}</p>
+                            </a>
+                            <!-- <li>
+                                <strong>${name}</strong>
+                                <p>${city}</p>
+                                <p>${phone}</p>
+                                <button onclick="showContent('${name}');">Show Content</button>
+                            </li> -->
+                        {{/each}}
+                    </script>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                    <div class="well" id="street_view">Click a marker to see the street view...</div>
+                </div>
+            </div>
         </div>
 
         <script src="js/jquery-1.11.3.min.js"></script>
